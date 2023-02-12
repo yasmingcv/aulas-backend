@@ -49,7 +49,6 @@ entradaDados.question('Digite a primeira nota:\n', function (primeiraNota) {
                 let resultado
 
                 resultado = calculoMedia.calcularMedia(valor1, valor2, valor3, valor4)
-                //console.log(resultado)
 
                 if (resultado == true) {
                     entradaDados.question('Digite a nota do exame:\n', function (exame) {
