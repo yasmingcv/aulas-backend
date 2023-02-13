@@ -17,13 +17,13 @@ var entradaDados = readLine.createInterface({
 entradaDados.question('Nome do aluno (a):\n', function (aluno) {
     let nomeAluno = aluno
 
-    entradaDados.question('Digite o sexo do (a) aluno (a):\n1- Feminino\n2- Masculino:\n', function (sexo1) {
+    entradaDados.question('Digite o sexo do (a) aluno (a):\n1 - Feminino\n2 - Masculino:\n', function (sexo1) {
         let sexoAluno = sexo1
 
         entradaDados.question('Nome do (a) professor (a):\n', function (professor) {
             let nomeProfessor = professor
 
-            entradaDados.question('Digite o sexo do (a) professor (a): \n1- Feminino\n 2- Masculino:\n', function (sexo2) {
+            entradaDados.question('Digite o sexo do (a) professor (a): \n1 - Feminino\n2 - Masculino:\n', function (sexo2) {
                 let sexoProfessor = sexo2
 
                 entradaDados.question('Digite o nome do curso:\n', function (curso) {
@@ -46,20 +46,29 @@ entradaDados.question('Nome do aluno (a):\n', function (aluno) {
                                         let valor4 = quartaNota
                                         let resultado
 
+                                        let generoAluno = calculoMedia.sexAluno(sexoAluno)
+                                        let generoProfessor = calculoMedia.sexProfessor(sexoProfessor)
+
                                         resultado = calculoMedia.calcularMedia(sexoAluno, valor1, valor2, valor3, valor4)
-                                        
-                                        console.log(calculoMedia.sexoAluno(1))
 
                                         //exame
-                                        if (resultado == true) {
+                                        if (resultado == 'exame') {
                                             entradaDados.question('\nVocê ficou de exame.\nDigite a nota do exame:\n', function (exame) {
                                                 let notaExame = exame
                                                 let exameNecessario
                                                 exameNecessario = calculoMedia.calcularMediaExame(sexoAluno, valor1, valor2, valor3, valor4, notaExame)
 
-
+                                                console.log('Alun' + calculoMedia.sexAluno(sexoAluno) + ' ' + exameNecessario + calculoMedia.sexAluno(sexoAluno))
                                             })
 
+                                        } else {
+                                            console.log('\n------------------RELATÓRIO------------------\n')
+                                            console.log('Alun' + generoAluno + ' ' + nomeAluno + ' ' + resultado + generoAluno + ' na disciplina ' + nomeDisciplina)
+                                            console.log('Curso: ' + nomeCurso)
+                                            console.log(generoProfessor + nomeProfessor)
+                                            console.log('Notas d' + generoAluno + ' alun' + generoAluno + ': ' + valor1 + ', ' + valor2 + ', ' + valor3 + ', ' + valor4)
+                                            //arrumar:
+                                            console.log('Média final: ' + calculoMedia.calcularMedia.resultado)
 
                                         }
                                     })

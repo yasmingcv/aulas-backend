@@ -11,7 +11,7 @@ const calcularMedia = function (generoAluno, primeiraNota, segundaNota, terceira
     let nota2 = Number(String(segundaNota))
     let nota3 = Number(String(terceiraNota))
     let nota4 = Number(String(quartaNota))
-
+    let statusAluno
 
 
     if (nota1 < 0 || nota2 < 0 || nota3 < 0 || nota4 < 0 || nota1 > 100 || nota2 > 100 || nota3 > 100 || nota4 > 100) {
@@ -24,12 +24,14 @@ const calcularMedia = function (generoAluno, primeiraNota, segundaNota, terceira
         let resultado = (nota1 + nota2 + nota3 + nota4) / 4
 
         if (resultado >= 70) {
-            console.log('Alun' + sexoAluno(sexoDoAluno) + ' aprovad' + sexoAluno(sexoDoAluno) + '\nMédia: ' + resultado)
+            statusAluno = 'aprovad'
         } else if (resultado >= 50 && resultado <= 69) {
-            return true
+            statusAluno = 'exame'           
         } else {
-            console.log('Alun' + sexoAluno(sexoDoAluno) + ' reprovad' + sexoAluno(sexoDoAluno) + '\nMédia: ' + resultado)
+            statusAluno = 'reprovad'          
         }
+
+        return statusAluno
     }
 }
 
@@ -40,6 +42,8 @@ const calcularMediaExame = function (generoAluno, primeiraNota, segundaNota, ter
     let nota3 = Number(String(terceiraNota))
     let nota4 = Number(String(quartaNota))
     let notaExame = Number(String(exame))
+    let statusAluno
+
 
     let mediaComExame
 
@@ -53,15 +57,17 @@ const calcularMediaExame = function (generoAluno, primeiraNota, segundaNota, ter
         console.log('ERRO: Digite um valor válido.')
     } else {
         if (mediaComExame < 60) {
-            console.log('Alun' + sexoAluno(sexoDoAluno) + ' reprovad' + sexoAluno(sexoDoAluno) + '\nMédia: ' + mediaComExame)
+            statusAluno = 'reprovad'
+            return statusAluno
         } else {
-            console.log('Alun' + sexoAluno(sexoDoAluno) + ' aprovad' + sexoAluno(sexoDoAluno) + '\nMédia: ' + mediaComExame)
+            statusAluno = 'aprovad'
+            return statusAluno
         }
     }
 
 }
 
-const sexoAluno = function (generoAluno) {
+const sexAluno = function (generoAluno) {
     let sexoAluno = generoAluno
 
     if (sexoAluno == 1) {
@@ -73,9 +79,22 @@ const sexoAluno = function (generoAluno) {
     }
 }
 
+const sexProfessor = function (generoProfessor) {
+    let sexoProfessor = generoProfessor
+
+    if (sexoProfessor == 1) {
+        sexoProfessor = 'Professora: '
+        return sexoProfessor
+    } else {
+        sexoProfessor = 'Professor: ';
+        return sexoProfessor;
+    }
+}
+
 
 module.exports = {
     calcularMedia,
     calcularMediaExame,
-    sexoAluno
+    sexAluno,
+    sexProfessor
 }
