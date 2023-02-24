@@ -5,27 +5,66 @@
  * Versão: 1.0
 *************************************************************************************************/
 
-const calcularParEImpar = function (inicial, final) {
+const calcularPar = function (inicial, final) {
     let numeroInicial = inicial
     let numeroFinal = final
-    let resto
+    let quantidade = 0
+    let status
 
-    while (numeroInicial <= numeroFinal) {
-        resto = numeroInicial % 2
-
-        while (resto == 0) {
-            console.log(numeroInicial)
-            numeroInicial++
-            while (resto != 0) {
+    if (numeroInicial < 0 || numeroInicial > 500) {
+        console.log('O número inicial deve estar entre 0 e 500.')
+        status = 'erro'
+    } else if (numeroFinal < 100 || numeroFinal > 1000) {
+        console.log('O número final deve estar entre 100 e 1000.')
+        status = 'erro'
+    } else if (isNaN(numeroInicial) || isNaN(numeroFinal) || numeroInicial == '' || numeroFinal == '') {
+        console.log('Por favor, digite um número válido.')
+        status = 'erro'
+    } else {
+        console.log('Números pares:')
+        while (numeroInicial <= numeroFinal) {
+            if (numeroInicial % 2 == 0) {
                 console.log(numeroInicial)
-                numeroInicial++
+                quantidade++
             }
-
+            numeroInicial++
         }
-
-
-
+        console.log('Quantidade de números pares encontrados: ' + quantidade + '\n')
     }
+    return status
 }
 
-calcularParEImpar(1, 100)
+const calcularImpar = function (inicial, final) {
+    let numeroInicial = inicial
+    let numeroFinal = final
+    let quantidade = 0
+    let status
+
+    if (numeroInicial < 0 || numeroInicial > 500) {
+        console.log('O número inicial deve estar entre 0 e 500.')
+        status = 'erro'
+    } else if (numeroFinal < 100 || numeroFinal > 1000) {
+        console.log('O número final deve estar entre 100 e 1000.')
+        status = 'erro'
+    } else if (isNaN(numeroInicial) || isNaN(numeroFinal) || numeroInicial == '' || numeroFinal == '') {
+        console.log('Por favor, digite um número válido.')
+        status = 'erro'
+    } else {
+        console.log('Números ímpares:')
+        while (numeroInicial <= numeroFinal) {
+            if (numeroInicial % 2 != 0) {
+                console.log(numeroInicial)
+                quantidade++
+            }
+            numeroInicial++
+        }
+        console.log('Quantidade de números ímpares encontrados: ' + quantidade + '\n')
+    }
+    return status
+}
+
+module.exports = {
+    calcularPar,
+    calcularImpar
+}
+
