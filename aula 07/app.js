@@ -207,42 +207,33 @@ const listagemProdutos = function () {
     // console.log('Cor: ' + listProdutosJSON.produtos[1].cores[1])
     // console.log('Modelo: ' + listProdutosJSON.produtos[1].modelos[1])
 
-    //-----------------Desafio--------------------
-    let tamanhoProdutosArray = listProdutosArray.length
+    /*********************Desafio*********************/
 
-    let contador = 0
+    //Percorre o Array de produtos para listar os itens
+    listProdutosJSON.produtos.forEach(function (itemProduto) {
+        console.log('Nome: ' + itemProduto.nome)
+        console.log('Marca: ' + itemProduto.marca)
+        console.log('Valor: ' + itemProduto.valor)
 
-    while (contador < tamanhoProdutosArray) {
-        console.log('Nome: ' + listProdutosJSON.produtos[contador].nome)
-        console.log('Marca: ' + listProdutosJSON.produtos[contador].marca)
-        console.log('Valor: ' + listProdutosJSON.produtos[contador].valor)
-
-        let tamanhoCoresArray = listProdutosJSON.produtos[contador].cores.length
-        let contadorCores = 0
-
-        console.log('Cores:')
-        while (contadorCores < tamanhoCoresArray) {
-            let cor = listProdutosJSON.produtos[contador].cores[contadorCores]
-            console.log('   ' + cor)
-            contadorCores++
-
+        //Tratamento de erro para quando não existir Array de cores 
+        if (itemProduto.cores != undefined) {
+            //Percorre o Array de cores que está dentro do Array de produtos
+            console.log('Cores:')
+            itemProduto.cores.forEach(function (itemCor) {
+                console.log('   ' + itemCor)
+            })
         }
 
-        //Modelos (arrumar bug, nem todos os produtos tem modelos)
-        let tamanhoModelosArray = listProdutosJSON.produtos[contador].modelos.length
-        let contadorModelos = 0
-
-        console.log('Modelos:')
-        while (contadorModelos < tamanhoModelosArray) {
-            let modelo = listProdutosJSON.produtos[contador].modelos[contadorModelos]
-            console.log('   ' + modelo)
-            contadorModelos++
+        //Tratamento de erro para quando não existir Array de modelos
+        if (itemProduto.modelos != undefined) {
+            //Percorre o Array de modelos que está dentro do Array de produtos
+            console.log('Modelos:')
+            itemProduto.modelos.forEach(function (itemModelo) {
+                console.log('   ' + itemModelo)
+            })
         }
-
-        contador++
-
-        console.log('--------------------')
-    }
+        console.log('--------------')
+    })
 }
 
 listagemProdutos()
