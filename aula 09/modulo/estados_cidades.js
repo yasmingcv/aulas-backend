@@ -22507,7 +22507,7 @@ const getListaDeEstados = function () {
 }
 
 const getDadosEstado = function (sigla) {
-   let uf = sigla
+   let uf = sigla.toUpperCase()
    let dadosEstadoJSON
 
    estadosCidades.estados.forEach(function (estado) {
@@ -22528,7 +22528,7 @@ const getDadosEstado = function (sigla) {
 }
 
 const getCapitalEstado = function (sigla) {
-   let uf = sigla
+   let uf = sigla.toUpperCase()
    let capitalEstadoJSON
 
    estadosCidades.estados.forEach(function (estado) {
@@ -22548,14 +22548,14 @@ const getCapitalEstado = function (sigla) {
 }
 
 const getEstadosRegiao = function (regiaoEstado) {
-   let regiao = regiaoEstado
+   let regiao = regiaoEstado.toUpperCase()
    let estadosRegiao = {}
    let estados = []
-   let status
+   let status = false
 
    estadosCidades.estados.forEach(function (estado) {
 
-      if (regiao == estado.regiao) {
+      if (regiao == estado.regiao.toUpperCase()) {
          estados.push({
             uf: estado.sigla,
             descricao: estado.nome
@@ -22571,7 +22571,7 @@ const getEstadosRegiao = function (regiaoEstado) {
    })
 
    if (status == false) {
-      return false
+      return status
    } else {
       return estadosRegiao
    }
@@ -22612,10 +22612,10 @@ const getCapitalPais = function () {
 }
 
 const getCidades = function (sigla) {
-   let siglaEstado = sigla
+   let siglaEstado = sigla.toUpperCase()
    let cidades = []
    let cidadesJSON = {}
-   let status
+   let status = false
 
    estadosCidades.estados.forEach(function (estado) {
       if (siglaEstado == estado.sigla) {
@@ -22637,7 +22637,7 @@ const getCidades = function (sigla) {
    cidadesJSON.cidades = cidades
 
    if (status == false) {
-      return false
+      return status
    } else {
       return cidadesJSON
    }
@@ -22647,7 +22647,7 @@ const getCidades = function (sigla) {
 // console.log(getListaDeEstados())
 // console.log(getDadosEstado('SP'))
 // console.log(getCapitalEstado('RJ'))
-// console.log(getEstadosRegiao('Nordeste'))
+// console.log(getEstadosRegiao('sul'))
 // console.log(getCapitalPais())
 // console.log(getCidades('AC'))
 
