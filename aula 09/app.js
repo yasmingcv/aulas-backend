@@ -179,7 +179,7 @@ app.get('/capitais', cors(), async function (request, response, next){
 })
 
 //EndPoint: Lista as cidades de um estado filtrando pela sigla
-app.get('/cidades/:uf', cors(), async function (request, response, next){
+app.get('/v1/cidades/:uf', cors(), async function (request, response, next){
     let statusCode
     let cidadesEstado = {}
 
@@ -204,6 +204,44 @@ app.get('/cidades/:uf', cors(), async function (request, response, next){
     response.json(cidadesEstado)
 
     next()
+})
+
+app.get('/v2/senai/cidades', cors(), async function (request, response, next){
+
+    /*
+        Existem 2 opções para receber variáveis para filtro:
+            - params: permite receber a variável na estrutura da URL criada no EndPoint.
+            (geralmente utilizado para ID (PK))
+            - query: permite receber uma ou muitas variáveis para realizar filtros.
+            (também conhecido como queryString)
+    */
+
+    //Recebe uma variável encaminhada via QueryString
+    let siglaEstado = request.query.uf
+
+    let statusCode
+    let dadosCidades = {}
+
+    if (siglaEstado == '' || siglaEstado == undefined || siglaEstado.length != 2 || !isNaN(siglaEstado)) {
+        statusCode = 400
+        dadosCidades.message = 'Não foi possível processar pois os dados e entrada (uf) que foi enviado não corresponde ao exigido, confira o valor, pois não pode ser vazio, precisa ser caracteres e ter dois dígitos.'
+    } else {
+        let cidades = estadosCidades.getCidades(siglaEstado)
+
+        if(cidades){
+            statusCode = 200
+            dadosCidades = cidades
+        } else {
+            statusCode = 404
+        }
+
+    }
+
+    response.status(statusCode)
+    response.json(dadosCidades)
+
+    next()
+
 })
 
 //Roda o serviço da API para ficar aguardando requisições
