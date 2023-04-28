@@ -9,7 +9,6 @@
 const express = require('express')
 const cors = require('cors')
 const bodyParser = require('body-parser')
-const { request, response } = require('express')
 
 //Cria o objeto app conforme a classe do express
 const app = express()
@@ -48,76 +47,61 @@ Instalação do PRISMA no projeto (biblioteca para conexão com BD)
     npx prisma migrate dev
 */
 
+//Define que os dados que irão chegar no body da requisição serão no padrão JSON
+const bodyParserJSON = bodyParser.json()
+
 //Import do arquivo da controller que irá solicitar a model os dados do BD
 var controllerAluno = require('./controller/controller_aluno.js')
 
 //EndPoint: retorna todos os dados de alunos
 app.get('/v1/lion-school/aluno', cors(), async function (request, response) {
 
-    //Recebe os dados da controller do aluno
-    let dadosAluno = await controllerAluno.getAlunos()
+    let nome = request.query.nome
 
-    //Valida se existe registros de aluno
-    if (dadosAluno) {
+    //Verifica se o usuário passou o nome e executa a função de buscar o aluno pelo nome
+    if (nome) {
+        //Recebe os dados da controller
+        let dadosAluno = await controllerAluno.getBuscarAlunoNome(nome)
+
         response.json(dadosAluno)
-        response.status(200)
-    } else {
-        response.json()
-        response.status(404)
+        response.status(dadosAluno.status)
+
+    } 
+    
+    //Se o usuário não passou o nome, executa a função de listar todos os alunos
+    else {
+
+        //Recebe os dados da controller do aluno
+        let dadosAluno = await controllerAluno.getAlunos()
+
+        response.json(dadosAluno)
+        response.status(dadosAluno.status)
     }
+
+
 
 })
 
 //EndPoint: retorna o aluno filtrando pelo ID
 app.get('/v1/lion-school/aluno/:id', cors(), async function (request, response) {
     let id = request.params.id
-    let dadosAluno = {}
-    let statusCode
 
-    if(isNaN(id) || id === ''){
-        dadosAluno.message = 'Erro de digitação'
-        statusCode = 500
-    } else {
-        dadosAluno = await controllerAluno.getBuscarAlunoID(id)
-
-        if (dadosAluno) {
-            statusCode = 200
-        } else {
-            statusCode = 404
-            dadosAluno.message = 'O aluno não existe'
-        }
-    }
+    dadosAluno = await controllerAluno.getBuscarAlunoID(id)
 
     response.json(dadosAluno)
-    response.status(statusCode)
+    response.status(dadosAluno.status)
 })
-
-app.get('/v1/lion-school/alunoo', cors(), async function (request, response) {
-    let nome = request.query.nome
-    let dadosAluno = {}
-    let statusCode
-
-    if (!isNaN(nome) || nome == '' || nome == null) {
-        dadosAluno.message = 'Erro de digitação'
-        statusCode = 500
-    } else {
-        dadosAluno = await controllerAluno.getBuscarAlunoNome(nome)
-
-        if (dadosAluno) {
-            statusCode = 200
-        } else {
-            statusCode = 404
-            dadosAluno.message = 'O aluno não existe'
-        }
-    }
-
-    response.json(dadosAluno)
-    response.status(statusCode)
-})
-
 
 //EndPoint: insere um dado novo
-app.post('/v1/lion-school/aluno', cors(), async function (request, response) {
+app.post('/v1/lion-school/aluno', cors(), bodyParserJSON, async function (request, response) {
+
+    //Recebe os dados encaminhados na requisição
+    let dadosBody = request.body
+
+    let resultDadosAluno = await controllerAluno.inserirAluno(dadosBody)
+
+    response.status(resultDadosAluno.status)
+    response.json(resultDadosAluno)
 
 })
 

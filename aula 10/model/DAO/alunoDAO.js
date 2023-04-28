@@ -14,7 +14,32 @@ var { PrismaClient } = require('@prisma/client')
 var prisma = new PrismaClient()
 
 //Inserir dados do aluno no banco de dados
-const insertAluno = function (dadosAluno) {
+const insertAluno = async function (dadosAluno) {
+
+    //Script SQL para inserir dados
+    let sql = `insert into tbl_aluno (
+                    nome,
+                    rg,
+                    cpf,
+                    data_nascimento,
+                    email
+                ) values (
+                    '${dadosAluno.nome}',
+                    '${dadosAluno.rg}',
+                    '${dadosAluno.cpf}',
+                    '${dadosAluno.data_nascimento}',
+                    '${dadosAluno.email}'
+                )`
+
+    //Executa o scriptSQL do BD
+    let resultStatus = await prisma.$executeRawUnsafe(sql)
+
+    if(resultStatus){
+        return true
+    } else {
+        return false
+    }
+
 
 }
 
@@ -77,5 +102,6 @@ const selectByNameAluno = async function (name) {
 module.exports = {
     selectAllAlunos,
     selectByIdAluno,
-    selectByNameAluno
+    selectByNameAluno,
+    insertAluno
 }
