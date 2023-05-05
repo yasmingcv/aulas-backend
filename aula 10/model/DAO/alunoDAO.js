@@ -44,13 +44,41 @@ const insertAluno = async function (dadosAluno) {
 }
 
 //Atualizar dados do aluno no banco de dados
-const updateAluno = function (id) {
+const updateAluno = async function (dadosAluno) {
+
+    //Script SQL para atualizar os dados no BD
+    let sql = `update tbl_aluno set 
+                    nome = '${dadosAluno.nome}',
+                    rg = '${dadosAluno.rg}',
+                    cpf = '${dadosAluno.cpf}',
+                    data_nascimento = '${dadosAluno.data_nascimento}',
+                    email = '${dadosAluno.email}'
+
+                    where id = ${dadosAluno.id}
+    `
+
+    //Executa o script no BD
+    let resultStatus = await prisma.$executeRawUnsafe(sql)
+
+    if(resultStatus){
+        return true 
+    } else {
+        return false
+    }
 
 }
 
 //Deletar dados do aluno no banco de dados
-const deleteAluno = function (id) {
+const deleteAluno = async function (id) {
+    let sql = `delete from tbl_aluno where id = ${id}`
 
+    let resultStatus = await prisma.$executeRawUnsafe(sql)
+
+    if(resultStatus) {
+        return true 
+    } else {
+        return false
+    }
 }
 
 //Retornar todos os alunos do banco de dados
@@ -87,6 +115,7 @@ const selectByIdAluno = async function (id) {
     }
 }
 
+//Retornar o aluno filtrando pelo nome
 const selectByNameAluno = async function (name) {
     let sql = `select * from tbl_aluno where nome like '%${name}%'`
 
@@ -103,5 +132,7 @@ module.exports = {
     selectAllAlunos,
     selectByIdAluno,
     selectByNameAluno,
-    insertAluno
+    insertAluno,
+    updateAluno,
+    deleteAluno
 }

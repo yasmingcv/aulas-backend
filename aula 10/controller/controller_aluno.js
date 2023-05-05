@@ -8,7 +8,7 @@
 //CRUD
 
 //Import do arquivo de configurações das variáveis, constantes e funções globais
-var messages = require('./modulo/config.js')
+var message = require('./modulo/config.js')
 
 //Import do arquio DAO para acessar dados do aluno no BD
 var alunoDAO = require('../model/DAO/alunoDAO.js')
@@ -23,7 +23,7 @@ const inserirAluno = async function (dadosAluno) {
         dadosAluno.data_nascimento == '' || dadosAluno.data_nascimento == undefined || dadosAluno.data_nascimento.length > 10  ||
         dadosAluno.email           == '' || dadosAluno.email           == undefined || dadosAluno.email.length           > 255
     ) {
-        return messages.ERROR_REQUIRED_FIELDS //400
+        return message.ERROR_REQUIRED_FIELDS //400
     }
     else {
         //Envia os dados para a model inserir no banco de dados
@@ -31,21 +31,66 @@ const inserirAluno = async function (dadosAluno) {
 
         //Valida se o BD inseriu corretamente os dados
         if(resultDadosAluno){
-            return messages.SUCCESS_CREATED_ITEM //201
+            return message.SUCCESS_CREATED_ITEM //201
         } else { 
-            return messages.ERROR_INTERNAL_SERVER //500
+            return message.ERROR_INTERNAL_SERVER //500
         }
     }
 }
 
 //Atualizar um aluno existente
-const atualizarAluno = function (dadosAluno) {
+const atualizarAluno = async function (dadosAluno, idAluno) {
+    if (
+        dadosAluno.nome            == '' || dadosAluno.nome            == undefined || dadosAluno.nome.length            > 100 ||
+        dadosAluno.rg              == '' || dadosAluno.rg              == undefined || dadosAluno.rg.length              > 15  ||
+        dadosAluno.cpf             == '' || dadosAluno.cpf             == undefined || dadosAluno.cpf.length             > 18  ||
+        dadosAluno.data_nascimento == '' || dadosAluno.data_nascimento == undefined || dadosAluno.data_nascimento.length > 10  ||
+        dadosAluno.email           == '' || dadosAluno.email           == undefined || dadosAluno.email.length           > 255
+    ) {
+        return message.ERROR_REQUIRED_FIELDS //400
 
+    //Validação de ID incorreto ou não informado
+    } else if (idAluno == '' || idAluno == undefined || isNaN(idAluno)) {
+        return message.ERROR_INVALID_ID //400
+    } else {
+        //Adiciona o ID do aluno no JSON dos dados
+        dadosAluno.id = idAluno
+
+        let resultDadosAluno = await alunoDAO.updateAluno(dadosAluno)
+
+        if (resultDadosAluno){
+            return message.SUCCESS_UPDATED_ITEM //200
+        } else {
+            return message.ERROR_INTERNAL_SERVER //500
+        }
+ 
+    }
 }
 
 //Excluir um aluno existente
-const deletarAluno = function (id) {
+const deletarAluno = async function (id) {
+    
+    if(id == ' ' || id == undefined || isNaN(id) || id == null){
+        return message.ERROR_INVALID_ID
 
+    } else {
+        let buscarById = await getBuscarAlunoID(id)
+
+        //Verifica se o aluno existe, se não existir, envia o retorno da função (getBuscarAlunoID)
+        if (buscarById.status == 404) {
+            return buscarById
+            
+        //Se o aluno existir, prossegue e deleta o aluno
+        } else {
+            let resultDadosAluno = await alunoDAO.deleteAluno(id)
+
+            if(resultDadosAluno) {
+                return message.SUCCESS_DELETED_ITEM //200
+            } else { 
+                return message.ERROR_INTERNAL_SERVER //500
+            }
+        }
+    }
 }
 
 //Retorna a lista de todos os alunos
@@ -72,7 +117,7 @@ const getBuscarAlunoID = async function (id) {
 
     //Verifica se o usuário digitou corretamente
     if(id == '' || isNaN(id) || id == undefined){
-        return messages.ERROR_REQUIRED_FIELDS
+        return message.ERROR_REQUIRED_FIELDS
     } else {
         let dadosAluno = await alunoDAO.selectByIdAluno(id)
 
@@ -81,19 +126,18 @@ const getBuscarAlunoID = async function (id) {
             dadosAlunoJSON.aluno = dadosAluno
             return dadosAlunoJSON
         } else {
-            return messages.ERROR_NOT_FOUND
+            return message.ERROR_NOT_FOUND
         }
     }
-
-
 }
 
+//Retorna o aluno filtrando pelo nome
 const getBuscarAlunoNome = async function (nome) {
     let dadosAlunosJSON = {}
 
     //Verifica se o usuário digitou corretamente
     if(nome == undefined || nome == '' || !isNaN(nome)){
-        return messages.ERROR_REQUIRED_FIELDS
+        return message.ERROR_REQUIRED_FIELDS
     }
 
     let dadosAluno = await alunoDAO.selectByNameAluno(nome)
@@ -104,7 +148,7 @@ const getBuscarAlunoNome = async function (nome) {
         dadosAlunosJSON.alunos = dadosAluno
         return dadosAlunosJSON
     } else {
-        return messages.ERROR_NOT_FOUND
+        return message.ERROR_NOT_FOUND
     }
 }
 
@@ -112,5 +156,7 @@ module.exports = {
     getAlunos,
     getBuscarAlunoID,
     getBuscarAlunoNome,
-    inserirAluno
+    inserirAluno,
+    atualizarAluno,
+    deletarAluno
 }
