@@ -54,7 +54,7 @@ const bodyParserJSON = bodyParser.json()
 var controllerAluno = require('./controller/controller_aluno.js')
 var message = require('./controller/modulo/config.js')
 
-//EndPoint: retorna todos os dados de alunos
+//EndPoint: retorna todos os dados de alunos, e se tiver query filtra pelo nome
 app.get('/v1/lion-school/aluno', cors(), async function (request, response) {
 
     let nome = request.query.nome
@@ -85,9 +85,9 @@ app.get('/v1/lion-school/aluno', cors(), async function (request, response) {
 
 //EndPoint: retorna o aluno filtrando pelo ID
 app.get('/v1/lion-school/aluno/:id', cors(), async function (request, response) {
-    let id = request.params.id
+    let idAluno = request.params.id
 
-    dadosAluno = await controllerAluno.getBuscarAlunoID(id)
+    let dadosAluno = await controllerAluno.getBuscarAlunoID(idAluno)
 
     response.json(dadosAluno)
     response.status(dadosAluno.status)

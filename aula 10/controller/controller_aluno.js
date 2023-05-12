@@ -17,11 +17,11 @@ var alunoDAO = require('../model/DAO/alunoDAO.js')
 const inserirAluno = async function (dadosAluno) {
     //Validação para tratar campos obrigatórios e quantidade de caracteres
     if (
-        dadosAluno.nome            == '' || dadosAluno.nome            == undefined || dadosAluno.nome.length            > 100 ||
-        dadosAluno.rg              == '' || dadosAluno.rg              == undefined || dadosAluno.rg.length              > 15  ||
-        dadosAluno.cpf             == '' || dadosAluno.cpf             == undefined || dadosAluno.cpf.length             > 18  ||
-        dadosAluno.data_nascimento == '' || dadosAluno.data_nascimento == undefined || dadosAluno.data_nascimento.length > 10  ||
-        dadosAluno.email           == '' || dadosAluno.email           == undefined || dadosAluno.email.length           > 255
+        dadosAluno.nome == '' || dadosAluno.nome == undefined || dadosAluno.nome.length > 100 ||
+        dadosAluno.rg == '' || dadosAluno.rg == undefined || dadosAluno.rg.length > 15 ||
+        dadosAluno.cpf == '' || dadosAluno.cpf == undefined || dadosAluno.cpf.length > 18 ||
+        dadosAluno.data_nascimento == '' || dadosAluno.data_nascimento == undefined || dadosAluno.data_nascimento.length > 10 ||
+        dadosAluno.email == '' || dadosAluno.email == undefined || dadosAluno.email.length > 255
     ) {
         return message.ERROR_REQUIRED_FIELDS //400
     }
@@ -30,9 +30,17 @@ const inserirAluno = async function (dadosAluno) {
         let resultDadosAluno = await alunoDAO.insertAluno(dadosAluno)
 
         //Valida se o BD inseriu corretamente os dados
-        if(resultDadosAluno){
-            return message.SUCCESS_CREATED_ITEM //201
-        } else { 
+        if (resultDadosAluno) {
+            //Chama a função que vai encontrar o ID gerado após o insert
+            let novoAluno = await alunoDAO.selectLastId()
+            let dadosAlunoJSON = {}
+
+            dadosAlunoJSON.status = message.SUCCESS_CREATED_ITEM.status //201
+            dadosAlunoJSON.aluno = novoAluno
+
+            return dadosAlunoJSON
+
+        } else {
             return message.ERROR_INTERNAL_SERVER //500
         }
     }
@@ -41,36 +49,50 @@ const inserirAluno = async function (dadosAluno) {
 //Atualizar um aluno existente
 const atualizarAluno = async function (dadosAluno, idAluno) {
     if (
-        dadosAluno.nome            == '' || dadosAluno.nome            == undefined || dadosAluno.nome.length            > 100 ||
-        dadosAluno.rg              == '' || dadosAluno.rg              == undefined || dadosAluno.rg.length              > 15  ||
-        dadosAluno.cpf             == '' || dadosAluno.cpf             == undefined || dadosAluno.cpf.length             > 18  ||
-        dadosAluno.data_nascimento == '' || dadosAluno.data_nascimento == undefined || dadosAluno.data_nascimento.length > 10  ||
-        dadosAluno.email           == '' || dadosAluno.email           == undefined || dadosAluno.email.length           > 255
+        dadosAluno.nome == '' || dadosAluno.nome == undefined || dadosAluno.nome.length > 100 ||
+        dadosAluno.rg == '' || dadosAluno.rg == undefined || dadosAluno.rg.length > 15 ||
+        dadosAluno.cpf == '' || dadosAluno.cpf == undefined || dadosAluno.cpf.length > 18 ||
+        dadosAluno.data_nascimento == '' || dadosAluno.data_nascimento == undefined || dadosAluno.data_nascimento.length > 10 ||
+        dadosAluno.email == '' || dadosAluno.email == undefined || dadosAluno.email.length > 255
     ) {
         return message.ERROR_REQUIRED_FIELDS //400
 
-    //Validação de ID incorreto ou não informado
+        //Validação de ID incorreto ou não informado
     } else if (idAluno == '' || idAluno == undefined || isNaN(idAluno)) {
         return message.ERROR_INVALID_ID //400
+
     } else {
         //Adiciona o ID do aluno no JSON dos dados
         dadosAluno.id = idAluno
 
-        let resultDadosAluno = await alunoDAO.updateAluno(dadosAluno)
+        let statusId = await alunoDAO.selectByIdAluno(idAluno)
 
-        if (resultDadosAluno){
-            return message.SUCCESS_UPDATED_ITEM //200
+        if (statusId) {
+
+            let resultDadosAluno = await alunoDAO.updateAluno(dadosAluno)
+            let dadosAlunoJSON = {}
+
+            if (resultDadosAluno) {
+                let alunoID = await getBuscarAlunoID(idAluno)
+
+                dadosAlunoJSON.status = message.SUCCESS_UPDATED_ITEM.status
+                dadosAlunoJSON.aluno = alunoID.aluno[0]
+
+                return dadosAlunoJSON //200
+
+            } else {
+                return message.ERROR_INTERNAL_SERVER //500
+            }
         } else {
-            return message.ERROR_INTERNAL_SERVER //500
+            return message.ERROR_NOT_FOUND
         }
- 
     }
 }
 
 //Excluir um aluno existente
 const deletarAluno = async function (id) {
-    
-    if(id == ' ' || id == undefined || isNaN(id) || id == null){
+
+    if (id == ' ' || id == undefined || isNaN(id) || id == null) {
         return message.ERROR_INVALID_ID
 
     } else {
@@ -79,14 +101,14 @@ const deletarAluno = async function (id) {
         //Verifica se o aluno existe, se não existir, envia o retorno da função (getBuscarAlunoID)
         if (buscarById.status == 404) {
             return buscarById
-            
-        //Se o aluno existir, prossegue e deleta o aluno
+
+            //Se o aluno existir, prossegue e deleta o aluno
         } else {
             let resultDadosAluno = await alunoDAO.deleteAluno(id)
 
-            if(resultDadosAluno) {
+            if (resultDadosAluno) {
                 return message.SUCCESS_DELETED_ITEM //200
-            } else { 
+            } else {
                 return message.ERROR_INTERNAL_SERVER //500
             }
         }
@@ -102,27 +124,31 @@ const getAlunos = async function () {
 
     if (dadosAluno) {
         //Criando um JSON com o atributo alunos, para encaminhar um array de alunos
+        dadosAlunosJSON.status = message.SUCCESS_REQUEST.status
+        dadosAlunosJSON.message = message.SUCCESS_REQUEST
         dadosAlunosJSON.quantidade = dadosAluno.length
         dadosAlunosJSON.alunos = dadosAluno
         return dadosAlunosJSON
     } else {
-        return false
+        return message.ERROR_NOT_FOUND
     }
 
 }
 
 //Retorna o aluno filtrando pelo ID
 const getBuscarAlunoID = async function (id) {
-    let dadosAlunoJSON = {}
 
     //Verifica se o usuário digitou corretamente
-    if(id == '' || isNaN(id) || id == undefined){
-        return message.ERROR_REQUIRED_FIELDS
+    if (id == '' || isNaN(id) || id == undefined) {
+        return message.ERROR_INVALID_ID
     } else {
+        let dadosAlunoJSON = {}
         let dadosAluno = await alunoDAO.selectByIdAluno(id)
 
         if (dadosAluno) {
             //Criando um JSON com o atributo alunos, para encaminhar um array de alunos
+            dadosAlunoJSON.status = message.SUCCESS_REQUEST.status
+            dadosAlunoJSON.message = message.SUCCESS_REQUEST
             dadosAlunoJSON.aluno = dadosAluno
             return dadosAlunoJSON
         } else {
@@ -136,7 +162,7 @@ const getBuscarAlunoNome = async function (nome) {
     let dadosAlunosJSON = {}
 
     //Verifica se o usuário digitou corretamente
-    if(nome == undefined || nome == '' || !isNaN(nome)){
+    if (nome == undefined || nome == '' || !isNaN(nome)) {
         return message.ERROR_REQUIRED_FIELDS
     }
 
